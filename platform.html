@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Platform — Hub3</title>
+<meta name="description" content="The Hub3 Ambassador platform: Community Ambassadors and Voting Ambassadors, fully customizable for your organization." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-screen-label="02 Platform">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">H<span class="dot">3</span></span> Hub3</a>
+    <div class="nav-links">
+      <div class="nav-dropdown">
+        <button class="nav-link" data-dropdown>Platform
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="platform.html"><strong>For Ambassadors</strong><small>Community Ambassador track</small></a>
+          <a href="platform.html#orgs"><strong>For Organizations</strong><small>Run your own ambassador program</small></a>
+          <a href="field-targeting.html"><strong>Field Targeting System</strong><small>Precinct-level data and dashboards</small></a>
+        </div>
+      </div>
+      <a href="field-targeting.html">Field Targeting</a>
+      <a href="about.html">About</a>
+      <a href="faq.html">FAQ</a>
+      <a href="lets-talk.html" class="nav-cta">Get in touch</a>
+    </div>
+    <button class="nav-burger" data-burger aria-label="Open menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+  <div class="mobile-menu">
+    <a href="platform.html">Platform</a>
+    <a href="field-targeting.html">Field Targeting</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="lets-talk.html">Get in touch →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <span class="eyebrow">Platform</span>
+    <h1 style="margin-top: 18px;">Two tracks. One ambassador network.</h1>
+    <p class="lead">A paid, two-track civic-engagement platform. Networks year-round on one track, turnout on Election Day on the other. Branded and configured per organization.</p>
+  </div>
+</section>
+
+<!-- ============ PRODUCT CARDS ============ -->
+<section class="alt" id="orgs">
+  <div class="container">
+    <div class="grid grid-2" style="gap: 32px;">
+      <!-- Community Ambassador -->
+      <article class="card" style="padding: 40px;">
+        <span class="eyebrow">Track 1</span>
+        <h2 style="margin-top: 12px; font-size: 36px;">Community Ambassador</h2>
+        <p class="lead" style="margin-top: 16px;">Grow engaged networks between elections.</p>
+        <ul class="check" style="margin-top: 28px;">
+          <li>Ambassadors complete a short weekly civic challenge on health, wealth, or power.</li>
+          <li>Each ambassador shares via referral link or QR code with their own network.</li>
+          <li>For each challenge completed and each referral made, ambassadors earn a stipend.</li>
+          <li>Stipends are sized to cover a cell phone or internet bill — civic engagement that pays for staying connected.</li>
+        </ul>
+        <p style="margin-top: 28px;"><a href="lets-talk.html" class="btn btn-secondary">Get in touch</a></p>
+      </article>
+
+      <!-- Voting Ambassador -->
+      <article class="card" id="voting" style="padding: 40px; background: var(--ink); color: #fff; border-color: var(--ink);">
+        <span class="eyebrow" style="color: #ff8a8a;">Track 2</span>
+        <h2 style="margin-top: 12px; font-size: 36px; color: #fff;">Voting Ambassador</h2>
+        <p class="lead" style="margin-top: 16px; color: #d4d6da;">Activate networks for relational voter turnout.</p>
+        <ul class="check" style="margin-top: 28px;">
+          <li style="color: #d4d6da;">Ambassadors graduate from the Community Ambassador track after training.</li>
+          <li style="color: #d4d6da;">They upload their contacts; the platform identifies who is eligible to become a volunteer <strong style="color: #fff;">Vote Tripler</strong>.</li>
+          <li style="color: #d4d6da;">A Vote Tripler commits to help three of their own contacts make a voting plan.</li>
+          <li style="color: #d4d6da;">Ambassadors earn a small recruitment payment for each Vote Tripler they sign up.</li>
+        </ul>
+        <p style="margin-top: 28px;"><a href="lets-talk.html" class="btn btn-secondary" style="border-color: #fff; color: #fff;">Get in touch</a></p>
+        <style>article#voting ul.check li::before { background: #ff8a8a; }</style>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CUSTOMIZABILITY ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Customizability</span>
+      <h2 style="margin-top: 12px;">Your colors. Your domain. Your rules.</h2>
+      <p class="lead" style="margin-top: 20px;">Hub3 is a platform, not a template. Every organization runs its own configuration — what gets shown, who qualifies, how much an ambassador earns. Your program looks like yours, because it is.</p>
+    </div>
+    <div class="grid grid-3" style="gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;">
+      <div style="background: #fff; padding: 32px;">
+        <h3>Brand & domain</h3>
+        <p style="color: var(--ink-2); margin-top: 8px;">Custom colors, logos, and copy. Host on your own subdomain so the program reads as the org's, not Hub3's.</p>
+      </div>
+      <div style="background: #fff; padding: 32px;">
+        <h3>Content</h3>
+        <p style="color: var(--ink-2); margin-top: 8px;">Bring your own weekly challenges. Health, wealth, civic power — or whatever curriculum your org is running.</p>
+      </div>
+      <div style="background: #fff; padding: 32px;">
+        <h3>Eligibility rules</h3>
+        <p style="color: var(--ink-2); margin-top: 8px;">Configure who qualifies as an ambassador or Vote Tripler. E.g. presidential-but-not-midterm voters in your county.</p>
+      </div>
+      <div style="background: #fff; padding: 32px;">
+        <h3>Communications</h3>
+        <p style="color: var(--ink-2); margin-top: 8px;">Customize the messages ambassadors send, the reminders they get, and the language used across the experience.</p>
+      </div>
+      <div style="background: #fff; padding: 32px;">
+        <h3>Stipend amounts</h3>
+        <p style="color: var(--ink-2); margin-top: 8px;">Set per-challenge pay, per-referral pay, and Vote Tripler recruitment payments to match your program budget.</p>
+      </div>
+      <div style="background: #fff; padding: 32px;">
+        <h3>Reporting</h3>
+        <p style="color: var(--ink-2); margin-top: 8px;">Track activity, payouts, and referrals at the ambassador, cohort, and program level — exportable for funders.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FIELD TARGETING CROSS-LINK ============ -->
+<section class="tan">
+  <div class="container narrow center">
+    <span class="eyebrow">Also from Hub3</span>
+    <h2 style="margin-top: 12px;">Need precinct-level field tools?</h2>
+    <p class="lead" style="margin-top: 16px;">If you're routing volunteers to doors, not just growing a network, look at the Field Targeting System.</p>
+    <p style="margin-top: 28px;"><a href="field-targeting.html" class="btn btn-primary">See the Field Targeting System
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a></p>
+  </div>
+</section>
+
+<!-- ============ CTA BAND ============ -->
+<section class="dark">
+  <div class="container narrow center">
+    <h2>If this fits, drop a note.</h2>
+    <p style="margin-top: 16px; color: #c8c9cd;">A real human replies within two business days. No pitch deck on the other end.</p>
+    <p style="margin-top: 28px;"><a href="lets-talk.html" class="btn btn-primary" style="background: #fff; color: var(--ink);">Get in touch →</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="grid grid-12" style="gap: 48px;">
+      <div style="grid-column: span 5;">
+        <a href="index.html" class="brand"><span class="brand-mark">H<span class="dot">3</span></span> Hub3</a>
+        <p style="margin-top: 14px; color: var(--ink-2); max-width: 36ch;">Civic-tech infrastructure for community organizations, campaigns, and nonprofits.</p>
+        <h4 style="margin-top: 32px;">Field memo</h4>
+        <form class="signup" data-signup>
+          <input type="email" placeholder="you@org.org" required aria-label="Email address" />
+          <button type="submit">Subscribe</button>
+        </form>
+        <p class="signup-note">Get the Hub3 field memo, ~monthly. No spam.</p>
+      </div>
+      <div style="grid-column: span 2;">
+        <h4>Platform</h4>
+        <a href="platform.html">Community Ambassador</a>
+        <a href="platform.html#voting">Voting Ambassador</a>
+        <a href="field-targeting.html">Field Targeting System</a>
+      </div>
+      <div style="grid-column: span 2;">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div style="grid-column: span 3;">
+        <h4>Contact</h4>
+        <a href="lets-talk.html">Get in touch</a>
+        <a href="mailto:hello@hub3.us">hello@hub3.us</a>
+        <p style="font-size: 14px; color: var(--ink-3); margin-top: 12px;">Hub3, Inc. · Washington, DC</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="privacy-note">© 2026 Hub3, Inc. · <a href="#" style="display:inline; padding:0;">Privacy</a> · <a href="#" style="display:inline; padding:0;">Terms</a> · <a href="lets-talk.html" style="display:inline; padding:0;">Contact</a><br/>
+      Hub3 handles voter data locally for partner organizations and never publishes household-level information.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

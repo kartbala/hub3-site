@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Field Targeting System — Hub3</title>
+<meta name="description" content="A precinct-level data and dashboard platform that turns statewide voter files into operational outputs your chairs and field staff actually use." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* page-specific */
+  .fts-hero { padding: clamp(72px, 10vw, 140px) 0 64px; }
+  .fts-hero .lead { font-size: clamp(20px, 1.7vw, 24px); max-width: 64ch; }
+  .steps-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .steps-strip > .step-card {
+    border-radius: 0;
+    border: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 28px;
+  }
+  .steps-strip > .step-card:last-child { border-right: 0; }
+  @media (max-width: 980px) {
+    .steps-strip { grid-template-columns: repeat(2, 1fr); }
+    .steps-strip > .step-card { border-bottom: 1px solid var(--line); }
+  }
+  @media (max-width: 540px) {
+    .steps-strip { grid-template-columns: 1fr; }
+  }
+  /* stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .stats-grid .stat { border-top: 1px solid var(--line); padding: 28px 0; }
+  @media (max-width: 880px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+
+  /* toggle for modes */
+  .mode-toggle {
+    display: inline-flex;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 32px;
+  }
+  .mode-toggle button {
+    border: 0;
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .mode-toggle button.active { background: var(--ink); color: #fff; }
+  .mode-toggle button.active.redacted { background: var(--red); }
+
+  .mode-screen { display: none; }
+  .mode-screen.active { display: block; }
+
+  /* dashboard mock */
+  .dash-mock {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 380px;
+  }
+  .dash-side {
+    background: var(--bg);
+    border-right: 1px solid var(--line);
+    padding: 16px;
+    font-size: 13px;
+  }
+  .dash-side .group-title {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    margin: 14px 0 6px;
+  }
+  .dash-side a {
+    display: block;
+    padding: 6px 8px;
+    border-radius: 3px;
+    color: var(--ink-2);
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .dash-side a.current { background: var(--ink); color: #fff; }
+  .dash-main { padding: 20px; }
+  .dash-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 80px 100px 90px;
+    gap: 12px;
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    align-items: center;
+  }
+  .dash-row.h { font-family: "JetBrains Mono", monospace; font-size: 11px; text-transform: uppercase; color: var(--ink-3); letter-spacing: 0.06em; }
+  .dash-row .tier { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 500; font-family: "JetBrains Mono", monospace; }
+  .tier-s { background: #e8f0fc; color: var(--blue-deep); }
+  .tier-1 { background: #fde8e8; color: var(--red); }
+  .tier-2 { background: #fdeed0; color: #6b4a00; }
+  .tier-3 { background: #ebe8df; color: var(--ink-3); }
+  .dash-row .doorid { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-3); }
+  .dash-row .redact { background: linear-gradient(transparent 45%, rgba(138,31,31,0.18) 45%, rgba(138,31,31,0.18) 55%, transparent 55%); color: transparent; user-select: none; }
+  .dash-row .name { font-weight: 500; }
+  @media (max-width: 720px) {
+    .dash-mock { grid-template-columns: 1fr; }
+    .dash-side { display: none; }
+    .dash-row { grid-template-columns: 24px 1fr 60px; }
+    .dash-row > :nth-child(4), .dash-row > :nth-child(5) { display: none; }
+  }
+
+  .built-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 880px) { .built-cards { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-screen-label="03 Field Targeting">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">H<span class="dot">3</span></span> Hub3</a>
+    <div class="nav-links">
+      <div class="nav-dropdown">
+        <button class="nav-link" data-dropdown>Platform <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="nav-dropdown-menu">
+          <a href="platform.html"><strong>For Ambassadors</strong><small>Community Ambassador track</small></a>
+          <a href="platform.html#orgs"><strong>For Organizations</strong><small>Run your own ambassador program</small></a>
+          <a href="field-targeting.html"><strong>Field Targeting System</strong><small>Precinct-level data and dashboards</small></a>
+        </div>
+      </div>
+      <a href="field-targeting.html" class="current">Field Targeting</a>
+      <a href="about.html">About</a>
+      <a href="faq.html">FAQ</a>
+      <a href="lets-talk.html" class="nav-cta">Get in touch</a>
+    </div>
+    <button class="nav-burger" data-burger aria-label="Open menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+  <div class="mobile-menu">
+    <a href="platform.html">Platform</a>
+    <a href="field-targeting.html">Field Targeting</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="lets-talk.html">Get in touch →</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="fts-hero">
+  <div class="container">
+    <span class="eyebrow">Hub3 · product</span>
+    <h1 style="margin-top: 18px;">The Field Targeting System.</h1>
+    <p class="lead" style="margin-top: 28px;">A precinct-level data and dashboard platform. The statewide voter file, voter history, polling places, address points, and precinct boundaries — joined into operational outputs chairs and field staff use. This is what we have; let us know if you want it.</p>
+    <div class="hero-ctas">
+      <a href="lets-talk.html" class="btn btn-primary">Get in touch <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+      <a href="lets-talk.html?interest=sample" class="btn btn-secondary">See a sample county</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHAIR WORKFLOW ============ -->
+<section class="alt">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Chair workflow</span>
+      <h2 style="margin-top: 12px;">What a chair does in the dashboard.</h2>
+      <p class="lead" style="margin-top: 20px;">Five steps. No data dictionary required. The chair is the user.</p>
+    </div>
+    <div class="steps-strip">
+      <div class="step-card">
+        <div class="num">STEP 01</div>
+        <h3>Pick a county and precinct.</h3>
+        <p>Open the precinct view for the county you're working today.</p>
+      </div>
+      <div class="step-card">
+        <div class="num">STEP 02</div>
+        <h3>Review priority doors.</h3>
+        <p>Scan the prioritized household list with plain-English turnout context.</p>
+      </div>
+      <div class="step-card">
+        <div class="num">STEP 03</div>
+        <h3>Open a map and route the shift.</h3>
+        <p>Drop into the map explorer and route a walkable shift under 90 minutes.</p>
+      </div>
+      <div class="step-card">
+        <div class="num">STEP 04</div>
+        <h3>Print or open the playbook.</h3>
+        <p>Generate the per-precinct PDF — queue, map, route, and audit in one document.</p>
+      </div>
+      <div class="step-card">
+        <div class="num">STEP 05</div>
+        <h3>Check gaps and provenance.</h3>
+        <p>Confirm address gaps, new voters, and source files before going out.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT'S IN THE BOX ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">What's in the box</span>
+      <h2 style="margin-top: 12px;">Built for chairs. Honest about the data.</h2>
+    </div>
+
+    <div class="feature-item">
+      <h3>Configurable county universe.</h3>
+      <div>
+        <p>County coverage is driven by a single config file; adding a county is config-first, not a code patch. The current build covers <strong>11 counties</strong> in North Carolina.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Voter and history join.</h3>
+      <div>
+        <p>Statewide voter and history files are joined per county, with status, party, race, age, registration date, vote history, county, precinct, polling place, propensity tier, supervoter status, geocoded location, and address-quality signals.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Propensity tiers.</h3>
+      <div>
+        <ul class="tight" style="margin: 0;">
+          <li><strong>Supervoter</strong> — voted in every required federal general and current-precinct municipal election they were registered for since 2018.</li>
+          <li><strong>Tier 1</strong> — never voted since 2018.</li>
+          <li><strong>Tier 2</strong> — presidential-only behavior plus missed registered midterms.</li>
+          <li><strong>Tier 3</strong> — sporadic voter, excluding supervoters and Tiers 1 / 2.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Priority precinct filters.</h3>
+      <div>
+        <p>Combine any of: configurable party-registration-share threshold, configurable demographic-share threshold (e.g. precincts where a given group is at least 50% of registered voters), propensity tier mix, and supervoter density. Each organization sets its own definitions; nothing is hard-coded to one party or coalition.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Household clustering.</h3>
+      <div>
+        <p>Doors group into <em>warm leads</em>, <em>family clusters</em>, and <em>solo</em> households so volunteers focus on the highest-leverage knocks first.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Plain-English turnout context.</h3>
+      <div>
+        <p>Each target shows a one-line <span class="kbd">last_seen_english</span> summary so a volunteer reading a card understands the history without a data dictionary.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Walkable route shifts.</h3>
+      <div>
+        <p>Routes are capped at 90 minutes of walking. The current build emits <strong>1,754 route shifts</strong> and <strong>zero</strong> exceed the cap.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Aging-in and new-registration cohorts.</h3>
+      <div>
+        <p>Per-county chunks of voters newly eligible or newly registered, with precinct context.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Absentee follow-up.</h3>
+      <div>
+        <p>Unreturned absentee rows pulled from statewide files with match-rate auditing.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Polling-place change signals.</h3>
+      <div>
+        <p>Inferred from historical precinct fields, surfaced as a rollup so chairs can warn affected voters.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Address gaps.</h3>
+      <div>
+        <p>Conservative multi-unit gap flags and AddressNC-derived "addresses with zero matched registered voters inside a target precinct polygon" rows. Chair-facing follow-up — not proof anyone lives there.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Printable playbooks.</h3>
+      <div>
+        <p>Per-precinct PDFs that fold the queue, the map, the route, and the audit into one document a county chair can hand a volunteer.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Local map explorer.</h3>
+      <div>
+        <p>County, precinct, ZIP, street / block, route-shift, address-gap, and polling-place modes. Public OpenStreetMap tiles for browser display only — no voter data leaves the local machine.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <h3>Audit & provenance built in.</h3>
+      <div>
+        <p>Every output traces back to source files and run logs. The Audit view shows source directories, generation timestamp, privacy mode at build time, absentee URLs tried, and audit table samples. Chairs check this before trusting an output.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BY THE NUMBERS ============ -->
+<section class="alt">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">By the numbers · current build</span>
+      <h2 style="margin-top: 12px;">What's actually in the system today.</h2>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><div class="num">11</div><div class="label">counties configured</div></div>
+      <div class="stat"><div class="num">913</div><div class="label">precinct summary rows</div></div>
+      <div class="stat"><div class="num">3,056,851</div><div class="label">active &amp; inactive registered voters in scope</div></div>
+      <div class="stat"><div class="num">54</div><div class="label">priority precincts with full v2 chair-action outputs</div></div>
+      <div class="stat"><div class="num">61,723</div><div class="label">target households</div></div>
+      <div class="stat"><div class="num">260,146</div><div class="label">aging-in / new-registration cohort rows</div></div>
+      <div class="stat"><div class="num">134,701</div><div class="label">absentee follow-up rows</div></div>
+      <div class="stat"><div class="num">2,833</div><div class="label">polling-place change rollup rows</div></div>
+      <div class="stat"><div class="num">54</div><div class="label">printable precinct playbooks</div></div>
+      <div class="stat"><div class="num">1,754<span style="color: var(--red);"> / 0</span></div><div class="label">route shifts emitted / over the 90-minute cap</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TWO MODES ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Two modes, one system</span>
+      <h2 style="margin-top: 12px;">The system you run is the system funders see — minus the voters.</h2>
+      <p class="lead" style="margin-top: 20px;">Switch the same build between full operational outputs and a redacted demo. One command. Same workflow. Same screens. Different surface area.</p>
+    </div>
+
+    <!-- Mode toggle controlling the dashboard mock -->
+    <div class="mode-toggle" role="tablist" aria-label="Mode">
+      <button class="active" data-mode="local" role="tab">Local mode</button>
+      <button data-mode="redacted" role="tab">Redacted demo</button>
+    </div>
+
+    <div class="dash-frame">
+      <div class="dash-bar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span id="dash-url">field.hub3.local · Durham 33-04 · priority doors</span>
+        <span class="badge" id="dash-badge">LOCAL</span>
+      </div>
+      <div class="dash-mock">
+        <aside class="dash-side">
+          <div class="group-title">County</div>
+          <a href="#">Durham</a>
+          <a href="#" class="current">Durham 33-04</a>
+          <a href="#">Durham 33-05</a>
+          <a href="#">Durham 35-01</a>
+          <div class="group-title">Views</div>
+          <a href="#">Priority doors</a>
+          <a href="#">Map explorer</a>
+          <a href="#">Aging-in</a>
+          <a href="#">Absentee follow-up</a>
+          <a href="#">Polling changes</a>
+          <a href="#">Audit</a>
+        </aside>
+        <div class="dash-main">
+          <!-- Local screen -->
+          <div class="mode-screen active" data-screen="local">
+            <div class="dash-row h">
+              <div>#</div><div>Household</div><div>Tier</div><div>Cluster</div><div>Door</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">01</div>
+              <div><div class="name">Whitaker, A. &amp; J.</div><div class="muted" style="font-size:12px;">412 Oak St · last voted 2020 G; missed 2022 M, 2024 P</div></div>
+              <div><span class="tier tier-2">TIER 2</span></div>
+              <div style="font-size:12px;">Family</div>
+              <div class="doorid">D-0412</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">02</div>
+              <div><div class="name">Boateng, K.</div><div class="muted" style="font-size:12px;">418 Oak St · registered 2024-08; never voted</div></div>
+              <div><span class="tier tier-1">TIER 1</span></div>
+              <div style="font-size:12px;">Solo</div>
+              <div class="doorid">D-0418</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">03</div>
+              <div><div class="name">Reyes-Pham household</div><div class="muted" style="font-size:12px;">421 Oak St · 3 registered voters · 2 supervoter</div></div>
+              <div><span class="tier tier-s">SUPER</span></div>
+              <div style="font-size:12px;">Warm</div>
+              <div class="doorid">D-0421</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">04</div>
+              <div><div class="name">Okonkwo, D.</div><div class="muted" style="font-size:12px;">425 Oak St · voted 2020 P, 2024 P only</div></div>
+              <div><span class="tier tier-2">TIER 2</span></div>
+              <div style="font-size:12px;">Solo</div>
+              <div class="doorid">D-0425</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">05</div>
+              <div><div class="name">Henderson, M. &amp; T.</div><div class="muted" style="font-size:12px;">429 Oak St · sporadic since 2018</div></div>
+              <div><span class="tier tier-3">TIER 3</span></div>
+              <div style="font-size:12px;">Family</div>
+              <div class="doorid">D-0429</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">06</div>
+              <div><div class="name">Vance, L.</div><div class="muted" style="font-size:12px;">434 Oak St · registered 2025-02; aging-in</div></div>
+              <div><span class="tier tier-1">TIER 1</span></div>
+              <div style="font-size:12px;">Solo</div>
+              <div class="doorid">D-0434</div>
+            </div>
+          </div>
+
+          <!-- Redacted screen -->
+          <div class="mode-screen" data-screen="redacted">
+            <div class="dash-row h">
+              <div>#</div><div>Household</div><div>Tier</div><div>Cluster</div><div>Door</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">01</div>
+              <div><div class="name redact">Whitaker, A. &amp; J.</div><div class="muted" style="font-size:12px;">[address redacted] · last voted 2020 G; missed 2022 M, 2024 P</div></div>
+              <div><span class="tier tier-2">TIER 2</span></div>
+              <div style="font-size:12px;">Family</div>
+              <div class="doorid">D-████</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">02</div>
+              <div><div class="name redact">Boateng, K.</div><div class="muted" style="font-size:12px;">[address redacted] · registered 2024-08; never voted</div></div>
+              <div><span class="tier tier-1">TIER 1</span></div>
+              <div style="font-size:12px;">Solo</div>
+              <div class="doorid">D-████</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">03</div>
+              <div><div class="name redact">Reyes-Pham household</div><div class="muted" style="font-size:12px;">[address redacted] · 3 registered voters · 2 supervoter</div></div>
+              <div><span class="tier tier-s">SUPER</span></div>
+              <div style="font-size:12px;">Warm</div>
+              <div class="doorid">D-████</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">04</div>
+              <div><div class="name redact">Okonkwo, D.</div><div class="muted" style="font-size:12px;">[address redacted] · voted 2020 P, 2024 P only</div></div>
+              <div><span class="tier tier-2">TIER 2</span></div>
+              <div style="font-size:12px;">Solo</div>
+              <div class="doorid">D-████</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">05</div>
+              <div><div class="name redact">Henderson, M. &amp; T.</div><div class="muted" style="font-size:12px;">[address redacted] · sporadic since 2018</div></div>
+              <div><span class="tier tier-3">TIER 3</span></div>
+              <div style="font-size:12px;">Family</div>
+              <div class="doorid">D-████</div>
+            </div>
+            <div class="dash-row">
+              <div class="doorid">06</div>
+              <div><div class="name redact">Vance, L.</div><div class="muted" style="font-size:12px;">[address redacted] · registered 2025-02; aging-in</div></div>
+              <div><span class="tier tier-1">TIER 1</span></div>
+              <div style="font-size:12px;">Solo</div>
+              <div class="doorid">D-████</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top: 56px; gap: 24px;">
+      <div class="card flat" style="background: #fff;">
+        <h3>Local mode <span style="font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--ink-3); margin-left:6px;">OPERATIONAL</span></h3>
+        <p style="margin-top: 12px; color: var(--ink-2);">Used by your organization on its own machines. Exact names, addresses, NCIDs, phone numbers, route stops, household labels, exact coordinates, and full printable playbooks. <strong style="color: var(--ink);">Never published, never deployed to a public URL, never committed.</strong></p>
+      </div>
+      <div class="card flat" style="background: #fff;">
+        <h3>Redacted demo mode <span style="font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--red); margin-left:6px;">PUBLIC-SAFE</span></h3>
+        <p style="margin-top: 12px; color: var(--ink-2);">Used for sharing with funders, boards, coalition partners, and the public. Masks names, addresses, NCIDs, phone numbers. Jitters or aggregates exact household coordinates. Disables sensitive PDFs. Keeps aggregate counts and workflow behavior so reviewers see exactly how the system works — without ever seeing a voter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIMITS / WHAT WE DON'T CLAIM ============ -->
+<section class="tan">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">What we don't claim</span>
+      <h2 style="margin-top: 12px;">Honest about the limits.</h2>
+      <p class="lead" style="margin-top: 20px;">Civic-tech buyers respect this. We do too.</p>
+    </div>
+    <div class="callout">
+      <ul class="limits-list tight" style="margin: 0; padding-left: 22px;">
+        <li>Some addresses won't geocode and stay blank.</li>
+        <li>Address-gap flags are leads to investigate, not proof that eligible voters live somewhere.</li>
+        <li>The voter file is current registration only; full historical address moves aren't reconstructable.</li>
+        <li>Polling-place change signals are inferred from historical precinct fields — not directly from a historical polling-site address feed.</li>
+        <li>Birth month / day isn't in the public voter file — birthday-style outputs use registration date as a public-data proxy and say so.</li>
+        <li>Only precincts that meet the chair-action threshold get household-level routes and playbooks. Other precincts get summary and boundary views.</li>
+        <li>No paid APIs required. No voter data is uploaded to any third-party map or AI service.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT'S BUILT ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">How it's built</span>
+      <h2 style="margin-top: 12px;">Local-first. Idempotent. Verifiable.</h2>
+    </div>
+    <div class="built-cards">
+      <div class="card flat">
+        <h3>Local-first.</h3>
+        <p style="margin-top: 10px;">Reads statewide voter, history, polling-place, address-point, and precinct-boundary files. Writes only to local output directories. Generated PII-bearing outputs are gitignored.</p>
+      </div>
+      <div class="card flat">
+        <h3>Idempotent builds.</h3>
+        <p style="margin-top: 10px;">Dashboard data regenerates from scratch on every build. Local mode and redacted mode are both one command. Switching between them is one command.</p>
+      </div>
+      <div class="card flat">
+        <h3>Verifiable.</h3>
+        <p style="margin-top: 10px;">Python and dashboard test suites, route-quality audits, address-match-rate audits, and run logs are first-class outputs — not afterthoughts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSER ============ -->
+<section class="dark">
+  <div class="container">
+    <div class="grid grid-12" style="gap: 56px; align-items: center;">
+      <div style="grid-column: span 6;">
+        <h2>See it on your county.</h2>
+        <p style="color: #c8c9cd; margin-top: 16px; max-width: 50ch;">If you're operating in one of our 11 NC counties, we can show you live priority precincts. Outside NC? We'll talk roadmap.</p>
+        <p style="margin-top: 28px;"><a href="lets-talk.html" class="btn btn-primary" style="background: #fff; color: var(--ink);">Get in touch →</a></p>
+      </div>
+      <div style="grid-column: span 6;">
+        <form class="form-grid" data-form style="max-width: none; background: var(--ink-2); padding: 28px; border-radius: 6px;">
+          <h3 style="color: #fff; margin-bottom: 6px;">Email me a sample county packet</h3>
+          <p style="color: #c8c9cd; font-size: 14px; margin: 0 0 8px;">A redacted PDF with the chair workflow, priority doors, route, and audit — for one of our 11 NC counties.</p>
+          <div class="form-row">
+            <label for="p-email" style="color: #c8c9cd;">Work email</label>
+            <input id="p-email" type="email" required />
+          </div>
+          <div class="form-row">
+            <label for="p-org" style="color: #c8c9cd;">Organization</label>
+            <input id="p-org" type="text" required />
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" style="background: #fff; color: var(--ink);">Send me a packet</button>
+            <span class="form-status" data-form-status style="color:#8be0a0;"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="grid grid-12" style="gap: 48px;">
+      <div style="grid-column: span 5;">
+        <a href="index.html" class="brand"><span class="brand-mark">H<span class="dot">3</span></span> Hub3</a>
+        <p style="margin-top: 14px; color: var(--ink-2); max-width: 36ch;">Civic-tech infrastructure for community organizations, campaigns, and nonprofits.</p>
+        <h4 style="margin-top: 32px;">Field memo</h4>
+        <form class="signup" data-signup>
+          <input type="email" placeholder="you@org.org" required aria-label="Email address" />
+          <button type="submit">Subscribe</button>
+        </form>
+        <p class="signup-note">Get the Hub3 field memo, ~monthly. No spam.</p>
+      </div>
+      <div style="grid-column: span 2;">
+        <h4>Platform</h4>
+        <a href="platform.html">Community Ambassador</a>
+        <a href="platform.html#voting">Voting Ambassador</a>
+        <a href="field-targeting.html">Field Targeting System</a>
+      </div>
+      <div style="grid-column: span 2;">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div style="grid-column: span 3;">
+        <h4>Contact</h4>
+        <a href="lets-talk.html">Get in touch</a>
+        <a href="mailto:hello@hub3.us">hello@hub3.us</a>
+        <p style="font-size: 14px; color: var(--ink-3); margin-top: 12px;">Hub3, Inc. · Washington, DC</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="privacy-note">© 2026 Hub3, Inc. · <a href="#" style="display:inline; padding:0;">Privacy</a> · <a href="#" style="display:inline; padding:0;">Terms</a> · <a href="lets-talk.html" style="display:inline; padding:0;">Contact</a><br/>
+      Hub3 handles voter data locally for partner organizations and never publishes household-level information.</div>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+<script>
+  // Mode toggle for the dashboard mock
+  document.querySelectorAll('.mode-toggle button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      document.querySelectorAll('.mode-toggle button').forEach((b) => {
+        b.classList.toggle('active', b.dataset.mode === mode);
+        b.classList.toggle('redacted', b.dataset.mode === 'redacted' && b.dataset.mode === mode);
+      });
+      document.querySelectorAll('.mode-screen').forEach((s) => {
+        s.classList.toggle('active', s.dataset.screen === mode);
+      });
+      const badge = document.getElementById('dash-badge');
+      const url = document.getElementById('dash-url');
+      if (mode === 'redacted') {
+        badge.textContent = 'REDACTED DEMO';
+        badge.classList.add('redacted');
+        url.textContent = 'demo.hub3.us · Durham 33-04 · priority doors';
+      } else {
+        badge.textContent = 'LOCAL';
+        badge.classList.remove('redacted');
+        url.textContent = 'field.hub3.local · Durham 33-04 · priority doors';
+      }
+    });
+  });
+</script>
+</body>
+</html>
