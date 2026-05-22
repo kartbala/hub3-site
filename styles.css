@@ -247,7 +247,7 @@ section.tan { background: var(--bg-2); }
 
 /* ---------- hero ---------- */
 .hero { padding: clamp(64px, 9vw, 128px) 0 clamp(48px, 7vw, 96px); border-top: 0; }
-.hero h1 { max-width: 16ch; }
+.hero h1 { max-width: 22ch; }
 .hero .lead { margin-top: 28px; max-width: 60ch; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; }
 
