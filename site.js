@@ -1,4 +1,4 @@
-// Hub3 site — small shared behaviors
+// Hub3 site -- small shared behaviors
 
 // Mobile menu toggle
 document.addEventListener('click', (e) => {
@@ -35,7 +35,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Form handler — placeholder endpoint
+// Form handler -- placeholder endpoint
 document.addEventListener('submit', (e) => {
   const form = e.target.closest('form[data-form]');
   if (!form) return;
